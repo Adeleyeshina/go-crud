@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -56,6 +57,13 @@ func CreateUser(ctx *gin.Context) {
 	var body models.User
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	reqex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+
+	if !reqex.MatchString(body.Email) {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Invalid Email type"})
 		return
 	}
 
